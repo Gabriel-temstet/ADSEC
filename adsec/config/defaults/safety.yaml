@@ -1,0 +1,17 @@
+# Parametres de securite operationnelle par defaut du scheduler.
+# Ces valeurs peuvent etre surchargees par engagement mais jamais depassees
+# silencieusement : toute surcharge est journalisee dans l'audit log.
+
+safety:
+  max_workers: 10
+  max_requests_per_second: 20
+  max_duration_minutes: 120
+  stop_on_error_rate: 0.30
+  per_key_concurrency: 4
+  retry_base_delay_seconds: 0.5
+  retry_max_delay_seconds: 8.0
+  circuit_breaker_failure_threshold: 5
+  circuit_breaker_reset_seconds: 30.0
+
+intrusive_actions:
+  enabled: false

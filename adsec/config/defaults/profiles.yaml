@@ -1,0 +1,41 @@
+# Profils de scan ADSEC.
+# Chaque profil documente explicitement son comportement : aucun profil,
+# meme "deep", ne modifie l'environnement audite.
+
+passive:
+  description: >
+    Decouverte minimale (resolution DNS de base, identification du domaine,
+    des DC et du niveau fonctionnel). Aucune enumeration LDAP/SMB/Kerberos
+    approfondie.
+  allowed_categories: ["discovery", "security"]
+  max_workers: 4
+  max_requests_per_second: 5
+
+safe:
+  description: >
+    Collecte et controles non intrusifs standards : enumeration LDAP
+    authentifiee, lecture des ACL et GPO accessibles, aucune requete
+    repetitive a fort volume.
+  allowed_categories: ["discovery", "collection", "security", "ldap", "acl", "gpo"]
+  max_workers: 8
+  max_requests_per_second: 15
+
+standard:
+  description: >
+    Collecte approfondie et controles supplementaires, explicitement non
+    destructifs : Kerberos, SMB, DNS, trusts en plus du perimetre "safe".
+  allowed_categories:
+    ["discovery", "collection", "security", "ldap", "acl", "gpo", "kerberos", "smb", "dns", "trusts"]
+  max_workers: 10
+  max_requests_per_second: 20
+
+deep:
+  description: >
+    Analyse la plus approfondie possible, potentiellement plus de requetes
+    (enumeration exhaustive, calcul complet des chemins d'attaque), mais
+    toujours sans aucune modification du domaine.
+  allowed_categories:
+    ["discovery", "collection", "security", "ldap", "acl", "gpo", "kerberos", "smb", "dns",
+     "trusts", "attackpaths"]
+  max_workers: 12
+  max_requests_per_second: 25

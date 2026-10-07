@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Lint (ruff)
+        run: ruff check adsec/
+
+      - name: Format check (ruff)
+        run: ruff format --check adsec/
+
+      - name: Type check (mypy --strict)
+        run: mypy adsec/
+
+      - name: Security scan (bandit)
+        run: bandit -r adsec/
+
+      - name: Dependency scan (pip-audit)
+        run: |
+          pip install pip-audit
+          pip-audit || true  # ne bloque pas la CI, remonte les CVE en log
+
+      - name: Unit + integration tests (pytest)
+        run: pytest tests/ -v --tb=short
+
+      - name: Build package
+        run: |
+          pip install build
+          python -m build
